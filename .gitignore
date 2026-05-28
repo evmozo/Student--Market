@@ -7,5 +7,15 @@ dist/
 npm-debug.log*
 .npmrc
 *.log
+*.log.*
 .vite/
 coverage/
+*.tar
+*.tar.*
+*.jar
+*.exe
+*.msi
+*.deb
+*.zip
+*.tgz
+*.sig
