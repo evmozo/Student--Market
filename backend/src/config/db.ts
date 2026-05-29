@@ -1,7 +1,14 @@
 import mongoose from "mongoose";
 import { env } from "./env";
 
-let memoryServer: { getUri(): string } | undefined;
+type MemoryServer = { getUri(): string };
+type MongoMemoryServerModule = {
+  MongoMemoryServer: {
+    create(options: { instance: { dbName: string } }): Promise<MemoryServer>;
+  };
+};
+
+let memoryServer: MemoryServer | undefined;
 
 export const connectDB = async (): Promise<void> => {
   mongoose.set("strictQuery", true);
@@ -11,11 +18,13 @@ export const connectDB = async (): Promise<void> => {
 };
 
 const startMemoryMongo = async (): Promise<string> => {
-  const { MongoMemoryServer } = await import("mongodb-memory-server");
-  memoryServer = await MongoMemoryServer.create({
+  const moduleName = "mongodb-memory-server";
+  const { MongoMemoryServer } = (await import(moduleName)) as MongoMemoryServerModule;
+  const server = await MongoMemoryServer.create({
     instance: { dbName: "student_marketplace" }
   });
-  const uri = memoryServer.getUri();
+  memoryServer = server;
+  const uri = server.getUri();
   console.log("Using in-memory MongoDB for local development");
   return uri;
 };
